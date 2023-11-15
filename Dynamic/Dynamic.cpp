@@ -174,12 +174,53 @@ void backpack() {
 	cout << "\n\n";
 }
 
+int* solve(int n) {
+	int* op = new int[n+1];
+	op[1] = 0, op[0] = 0;
+	int i, j;
+	for (i = 2; i <= n; i++) {
+		op[i] = fabs(op[i - 1]) + 1;
+		for (j = 2; j <= i - 1; j++) {
+			op[i] = fmin(op[i], fabs(op[j]) + fabs(op[i - j]) + 1);
+			if (i % j == 0)
+				op[i] = fmin(fabs(op[i]), fabs(op[i / j]) + j - 1) * -1;
+		}
+	}
+	return op;
+}
+
+void operations_pow(int* oper, int n) {
+	for (int i = 1; i <= n; i++) {
+		if (oper[i] < 0) {
+			int j = 2;
+			while (i % j != 0)
+				j++;
+			printf("\n  (k^%d)^%d  (power %d)", j, i / j, i);
+		}
+		else
+			printf("\n  k^%d*k  (power %d)", i - 1, i);
+	}
+}
+
+void operation() {
+	int n;
+	cout << "Enter the power of the number: ";
+	cin >> n;
+
+	int* op = solve(n);
+	int op_val = op[n];
+	cout << "\n\nOptimal value of operations: " << fabs(op_val);
+
+	operations_pow(op, n);
+	cout << "\n\n";
+}
+
 int main() {
 	string title = "Welcome to working with dynamic programming method!\n\n";
 	for (int i = 0; i < title.length(); i++) {
 		cout << title[i];
 		Sleep(15);
 	}
-	backpack();
+	operation();
 }
 
