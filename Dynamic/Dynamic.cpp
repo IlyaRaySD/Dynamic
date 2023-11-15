@@ -172,6 +172,10 @@ void backpack() {
 	cout << "These items need to be put: ";
 	for (int i = 0; i < num_of_items; i++) if (b[i]) cout << items[i].name << ' ';
 	cout << "\n\n";
+
+	for (int i = 0; i < num_of_items + 1; i++)
+		delete[] A[i];
+	delete[] A;
 }
 
 int* solve(int n) {
@@ -215,12 +219,79 @@ void operation() {
 	cout << "\n\n";
 }
 
+void print_agct(int** mat, string s1, string s2, int** mat_for_green) {
+	cout << "    ";
+	for (int i = 0; i < s2.length(); i++) cout << s2[i] << "  ";
+	cout << endl;
+	for (int i = 0; i < s1.length(); i++) {
+		cout << ' ' << s1[i] << "  ";
+		for (int j = 0; j < s2.length(); j++) {
+			if (mat_for_green[i][j] == 1) {
+				SetConsoleTextAttribute(console, FOREGROUND_GREEN);
+				cout << mat[i][j] << "  ";
+				SetConsoleTextAttribute(console, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+			}
+			else
+				cout << mat[i][j] << "  ";
+		}
+		cout << endl;
+	}
+}
+
+string result_agct(int** mat, int** fin, string s1, string s2) {
+	string res;
+	int max = fin[s1.length() - 1][s2.length() - 1];
+	while (max) {
+		if
+	}
+	return " ";
+}
+
+void agct() {
+	string s1, s2;
+	cout << "Enter a 1st word (consisting of letters 'a', 'g', 'c', 't'): ";
+	cin >> s1;
+	cout << "\nEnter a 2nd word (consisting of letters 'a', 'g', 'c', 't'): ";
+	cin >> s2;
+
+	int** mat = new int*[s1.length()];
+	int** mat_fin = new int* [s1.length()];
+	for (int i = 0; i < s1.length(); i++) mat[i] = new int[s2.length()];
+	for (int i = 0; i < s1.length(); i++) mat_fin[i] = new int[s2.length()];
+
+	for (int i = 0; i < s1.length(); i++) {
+		for (int j = 0; j < s2.length(); j++) {
+			mat[i][j] = 0;
+			mat_fin[i][j] = 0;
+			if (s1[i] == s2[j]) {
+				mat[i][j] = 1;
+				mat_fin[i][j] = 1;
+			}
+		}
+	}
+
+	print_agct(mat, s1, s2, mat);
+
+	for (int i = 0; i < s1.length(); i++) {
+		for (int j = 0; j < s2.length(); j++) {
+			if (mat[i][j] == 1)
+				mat_fin[i][j] = mat_fin[clamp(i - 1)][clamp(j - 1)] + 1;
+			else
+				mat_fin[i][j] = fmax(mat_fin[clamp(i - 1)][j], mat_fin[i][clamp(j - 1)]);
+		}
+	}
+	cout << endl;
+	print_agct(mat_fin, s1, s2, mat);
+	cout << "\nMaximum length: " << mat_fin[s1.length() - 1][s2.length() - 1];
+
+}
+
 int main() {
 	string title = "Welcome to working with dynamic programming method!\n\n";
 	for (int i = 0; i < title.length(); i++) {
 		cout << title[i];
 		Sleep(15);
 	}
-	operation();
+	agct();
 }
 
