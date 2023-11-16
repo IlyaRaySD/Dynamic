@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <math.h>
 #include <windows.h>
+#include "additional_foo.h"
 using namespace std;
 
 HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -11,32 +12,12 @@ struct Item {
 	int price;
 };
 
-int clamp(int a) { return (a > 0) ? a : 0; }
-
-int length_of_num(int num) {
-	int l = 0;
-	do {
-		l++;
-		num /= 10;
-	} while (num);
-	return l;
-}
-
-int* finding_path(int** mat, int n) {
-	int max = mat[n - 1][0];
-	int max_index;
-	int* red_indexes = new int[n];
-	for (int i = 1; i <= n; i++) {
-		if (max < mat[n - 1][i]) {
-			max = mat[n - 1][i];
-			max_index = i;
-		}
-	}
-	red_indexes[n - 1] = max_index;
-	for (int i = n - 2; i >= 0; i--) {
-		(mat[i][red_indexes[i + 1]] > mat[i][red_indexes[i + 1] - 1]) ? red_indexes[i] = red_indexes[i + 1] : red_indexes[i] = red_indexes[i + 1] - 1;
-	}
-	return red_indexes;
+int opt_catch() {
+	cout << "\nselect algorithm:\n";
+	cout << "1 - Triangle problem\n2 - Turtle problem\n3 - Power of a number\n4 - Biological problem\n5 - Backpack problem\n0 - Quit\n\nEnter the number: ";
+	int choose;
+	cin >> choose;
+	return choose;
 }
 
 void print_mat_triangle(int** mat, int m, int n, int* path) {
@@ -170,40 +151,12 @@ void backpack() {
 		b[k-1] = 1;
 	}
 	cout << "These items need to be put: ";
-	for (int i = 0; i < num_of_items; i++) if (b[i]) cout << items[i].name << ' ';
+	for (int i = 0; i < num_of_items; i++) if (b[i]) cout << items[i+1].name << ' ';
 	cout << "\n\n";
 
 	for (int i = 0; i < num_of_items + 1; i++)
 		delete[] A[i];
 	delete[] A;
-}
-
-int* solve(int n) {
-	int* op = new int[n+1];
-	op[1] = 0, op[0] = 0;
-	int i, j;
-	for (i = 2; i <= n; i++) {
-		op[i] = fabs(op[i - 1]) + 1;
-		for (j = 2; j <= i - 1; j++) {
-			op[i] = fmin(op[i], fabs(op[j]) + fabs(op[i - j]) + 1);
-			if (i % j == 0)
-				op[i] = fmin(fabs(op[i]), fabs(op[i / j]) + j - 1) * -1;
-		}
-	}
-	return op;
-}
-
-void operations_pow(int* oper, int n) {
-	for (int i = 1; i <= n; i++) {
-		if (oper[i] < 0) {
-			int j = 2;
-			while (i % j != 0)
-				j++;
-			printf("\n  (k^%d)^%d  (power %d)", j, i / j, i);
-		}
-		else
-			printf("\n  k^%d*k  (power %d)", i - 1, i);
-	}
 }
 
 void operation() {
@@ -239,12 +192,50 @@ void print_agct(int** mat, string s1, string s2, int** mat_for_green) {
 }
 
 string result_agct(int** mat, int** fin, string s1, string s2) {
-	string res;
-	int max = fin[s1.length() - 1][s2.length() - 1];
-	while (max) {
-		if
+	string res = "";
+	int lon = 0;
+	int lonx = 0;
+	int lony = 0;
+	bool flag = false;
+	for (int i = s1.length() - 1; i > 0; i--) {
+		for (int j = s2.length() - 1; j > 0; j--) {
+			if (mat[i][j] == 1) {
+				lon = fin[i][j];
+				flag = true;
+				lonx = i;
+				lony = j;
+				break;
+			}
+			
+		}
+		if (flag)
+			break;
 	}
-	return " ";
+	res += s1[lonx];
+	for (int k = 0; k < lon - 1; k++) {
+		if (mat[lonx - 1][lony - 1] == 1) {
+			lonx--;
+			lony--;
+			res += s1[lonx];
+			continue;
+		}
+		else {
+			for (int i = lonx; i > lonx - 3 and flag; i--) {
+				for (int j = lony; j > lony - 3 and flag; j--) {
+					if (i != lonx or j != lony) {
+						if (mat[i][j] == 1) {
+							lonx = i;
+							lony = j;
+							flag = false;
+						}
+					}
+				}
+			}
+		}
+		res += s1[lonx];
+		flag = true;
+	}
+	return res;
 }
 
 void agct() {
@@ -255,7 +246,7 @@ void agct() {
 	cin >> s2;
 
 	int** mat = new int*[s1.length()];
-	int** mat_fin = new int* [s1.length()];
+	int** mat_fin = new int*[s1.length()];
 	for (int i = 0; i < s1.length(); i++) mat[i] = new int[s2.length()];
 	for (int i = 0; i < s1.length(); i++) mat_fin[i] = new int[s2.length()];
 
@@ -283,6 +274,19 @@ void agct() {
 	cout << endl;
 	print_agct(mat_fin, s1, s2, mat);
 	cout << "\nMaximum length: " << mat_fin[s1.length() - 1][s2.length() - 1];
+	cout << "\nResult subsequence: ";
+	for (int i = result_agct(mat, mat_fin, s1, s2).length() - 1; i >= 0; i--)
+		cout << result_agct(mat, mat_fin, s1, s2)[i];
+	cout << "\n\n";
+	for (int i = 0; i < s1.length(); i++)
+		delete[] mat[i];
+	delete[] mat;
+	for (int i = 0; i < s1.length(); i++)
+		delete[] mat_fin[i];
+	delete[] mat_fin;
+}
+
+void turtle() {
 
 }
 
@@ -292,6 +296,59 @@ int main() {
 		cout << title[i];
 		Sleep(15);
 	}
-	agct();
+	string question = "Continue?(1 - yes, 0 - no)"; // text with a question about continuing the program
+link: // mark
+	int c; // user selected option
+	c = opt_catch();
+	if (c == 1) {
+		triangle();
+		bool ask = 0;
+		cout << question << endl;
+		cin >> ask;
+		if (ask == 1) goto link; // if continuation is selected
+		else system("pause"); // end of the program
+	}
+	if (c == 2) {
+		turtle();
+		bool ask = 0;
+		cout << question << endl;
+		cin >> ask;
+		if (ask == 1) goto link; // if continuation is selected
+		else system("pause"); // end of the program
+	}
+	if (c == 3) {
+		operation();
+		bool ask = 0;
+		cout << question << endl;
+		cin >> ask;
+		if (ask == 1) goto link; // if continuation is selected
+		else system("pause"); // end of the program
+	}
+	if (c == 4) {
+		agct();
+		bool ask = 0;
+		cout << question << endl;
+		cin >> ask;
+		if (ask == 1) goto link; // if continuation is selected
+		else system("pause"); // end of the program
+	}
+	if (c == 5) {
+		backpack();
+		bool ask = 0;
+		cout << question << endl;
+		cin >> ask;
+		if (ask == 1) goto link; // if continuation is selected
+		else system("pause"); // end of the program
+	}
+	if (c == 0) {
+		system("pause"); // end of the program
+	}
+	if (c > 8 or c < 0) { // if the option is not in the instructions
+		cout << endl;
+		cout << "Please follow the instructions!";
+		cout << endl;
+		goto link;
+	}
 }
+
 
